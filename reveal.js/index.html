@@ -1,49 +1,356 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+	<title>reveal.js</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/black.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/monokai.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement( 'link' );
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+</head>
+<body>
+<div class="reveal">
+	<div class="slides">
+		<section>Callbacks, Promises, and Async Await</section>
+		<section>
+			<section>
+				<h2>Callbacks</h2>
+			</section>
+			<section>
+				<h2>Callbacks</h2>
+				<h3>What is a Callback?</h3>
+				<p>When a function simply accepts another function as an argument,
+					this contained function is known as a <b>callback</b> function</p>
+				<p>You can find them in most JavaScript code; either in simple functions like setInterval,
+					event listening or when making API calls.</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+setInterval(() => {
+    console.log('Hello, I am callback!');
+}, 1000);
+// setInterval accepts a callback as its first parameter
+</code></pre>
+			</section>
+			<section>
+				<h2>Callbacks</h2>
+				<p>Array methods also uses callbacks. For example map:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const numbers = [1, 4, 9];
+const sqrt = numbers.map(value => Math.sqrt(value));
+console.log(sqrt); // [1, 2, 3]
+</code></pre>
+			</section>
+			<section>
+				<h2>Callbacks</h2>
+				<p>Callback functions also can be named and used in another functions:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const greeting = name => {
+    console.log(`Hello ${name}, welcome to Scotch!`);
+};
 
-		<script src="js/reveal.js"></script>
+const introduction = (firstName, lastName, callback) => {
+    const fullName = `${firstName} ${lastName}`;
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true }
-				]
-			});
-		</script>
-	</body>
+    callback(fullName); // invoke function greeting
+};
+
+introduction('Chris','Nwamba', greeting); // passing function greeting as a parameter
+</code></pre>
+			</section>
+			<section>
+				<h2>Callback hell</h2>
+				<p>Multiple functions can be created independently and used as callback functions.
+					These create multi-level functions. When this function tree created becomes too large,
+					the code becomes incomprehensible sometimes and is not easily refactored.
+					This is known as <b>callback hell.</b></p>
+			</section>
+			<section>
+				<h2>Callback hell</h2>
+				<img src="images/callbackhell.png" alt="Callback hell">
+			</section>
+			<section>
+				<h2>Callback hell solution - <b>Promises</b></h2>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h2>Promises</h2>
+			</section>
+			<section>
+				<h2>Promises</h2>
+				<p>A <b>promise</b> is an object which keeps track of whether the asynchronous event has happened
+					already or not and determines what happens after the event has occurred.
+					A promise is used to handle the asynchronous result of an operation.
+					JavaScript is designed to not wait for an asynchronous block of code to completely
+					execute before other synchronous parts of the code can run.
+					For instance, when making API requests to servers, we have no idea if these servers are offline
+					or online, or how long it takes to process the server request.</p>
+			</section>
+			<section>
+				<h2>Promises states</h2>
+				<ul>
+					<li><b>Pending:</b> This is the initial state of the Promise before an operation begins</li>
+					<li><b>Fulfilled:</b> This means the specified operation was completed</li>
+					<li><b>Rejected:</b> The operation did not complete; an error value is usually thrown</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Creating a promise</h2>
+				<p>The Promise object is created using the <b>new</b> keyword and contains the <b>promise</b>;
+					this is an executor function which has a <b>resolve</b> and a <b>reject</b> callback.
+					As the names imply, each of these callbacks returns a value with the reject callback
+					returning an error object.</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const promise = new Promise(function(resolve, reject) {
+    // The function passed to new Promise is called the executor.
+    // When the promise is created, this executor function runs automatically
+});
+</code></pre>
+			</section>
+			<section>
+				<h2>Creating a promise</h2>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const state = new Promise((resolve, reject) => {
+    const value = Math.random();
+    if (value > 0.5) {
+        resolve(value);
+    } else {
+        reject(value);
+    }
+});
+</code></pre>
+			</section>
+			<section>
+				<h2>Promises chaining</h2>
+				<p>Using a promise that has been created is relatively straightforward;
+					we chain <b>.then()</b> and <b>.catch()</b> to our Promise</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const state = new Promise((resolve, reject) => {
+    const value = Math.random();
+    if (value > 0.5) {
+        resolve(value);
+    } else {
+        reject(value);
+    }
+});
+
+state.then(value => {
+    console.log(`Promise resolved, value = ${value}`);
+})
+    .catch(value => {
+        console.log(`Promise rejected, value = ${value}`);
+    });
+</code></pre>
+			</section>
+			<section>
+				<h2>Promises chaining</h2>
+				<p><b>.then()</b> receives a function with an argument which is the resolve value of our promise.
+					<b>.catch</b> returns the reject value of our promise.</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+new Promise(function(resolve, reject) {
+    setTimeout(() => resolve(1), 1000); // resolves in 1 sec
+}).then(result => {
+    console.log(result); // 1
+    return result * 2; // value passed to the next .then handler
+}).then(result => {
+    console.log(result); // 2
+    return result * 2; // value passed to the next .then handler
+}).then(result => {
+    console.log(result); // 4
+    return result * 2;
+});
+</code></pre>
+			</section>
+			<section>
+				<h2>Handle errors in promises</h2>
+				<p>If our promise rejected we can handle error with <b>.then(null, errorHandlingFunction).</b>
+					Or we can use <b>.catch(errorHandlingFunction)</b>, which is exactly the same:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+let promise = new Promise((resolve, reject) => {
+    setTimeout(() => reject(new Error("Some error")), 1000);
+});
+
+promise.catch(err => console.log(err)); // shows "Error: Some error" after 1 second
+// .catch(function) is the same as promise.then(null, function)
+</code></pre>
+			</section>
+			<section>
+				<h2>Finally in promises</h2>
+				<p>Just like there’s a <b>finally</b> clause in a regular try catch , there’s <b>finally</b> in promises.
+					The call <b>.finally(f)</b> is similar to .then(f, f) in the sense that it always runs
+					when the promise is settled: be it resolve or reject.
+					<b>finally</b> is a good handler for performing cleanup,
+					e.g. stopping our loading indicators, as they are not needed any more,
+					no matter what the outcome is.
+				</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+new Promise((resolve, reject) => {
+    setTimeout(() => resolve("result"), 2000)
+})
+    .finally(() => console.log("Promise ready"))
+    .then(result => console.log(result)); // .then handles the result
+</code></pre>
+			</section>
+			<section>
+				<h2>Promise methods</h2>
+				<p>There are 4 static methods in the <b>Promise</b> class.</p>
+				<ul>
+					<li><b>Promise.resolve</b></li>
+					<li><b>Promise.reject</b></li>
+					<li><b>Promise.all</b></li>
+					<li><b>Promise.race</b></li>
+				</ul>
+			</section>
+			<section>
+				<h2>Promise.resolve</h2>
+				<p>The syntax:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const promise = Promise.resolve(value);
+// same as const promise = new Promise(resolve => resolve(value));
+</code></pre>
+				<p>The method is used when we already have a value, but would like to have it “wrapped” into a promise.</p>
+			</section>
+			<section>
+				<h2>Promise.reject</h2>
+				<p>The syntax:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const promise = Promise.reject(error);
+// same as const promise = new Promise((resolve, reject) => reject(error));
+</code></pre>
+			</section>
+			<section>
+				<h2>Promise.all</h2>
+				<p>The syntax:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const promise = Promise.all([promises]);
+</code></pre>
+				<p>It takes an array of promises and returns a new promise.
+					The new promise resolves when all listed promises are settled and has an array of their results.
+					If any of the promises is rejected, <b>Promise.all</b> immediately rejects with that error.</p>
+			</section>
+			<section>
+				<h2>Promise.race</h2>
+				<p>The syntax:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+const promise = Promise.race([promises]);
+</code></pre>
+				<p>Similar to <b>Promise.all</b>, it takes an iterable of promises, but instead of waiting for all
+					of them to finish, it waits for the first result (or error), and goes on with it.
+					So, the first result/error becomes the result of the whole <b>Promise.race.</b>
+					After the first settled promise “wins the race”, all further results/errors are ignored.</p>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h2>Async Await</h2>
+			</section>
+			<section>
+				<h2>Async functions</h2>
+				<p>An async function is a modification to the syntax used in writing promises.
+					You can call it syntactic sugar over promises.
+					It only makes writing promises easier.
+				</p>
+			</section>
+			<section>
+				<h2>Create async functions</h2>
+				<p>Async functions are created by prepending the word <b>async</b> before the function declaration
+					like this:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+async function f() {
+    return 1;
+}
+
+// or
+
+const asyncFunction = async () => {
+    return 1;
+};
+</code></pre>
+			</section>
+			<section>
+				<h2>Async functions</h2>
+				<p>An async function returns a promise -
+					if the function returns a value, the promise will be resolved with the value,
+					but if the async function throws an error, the promise is rejected with that value.</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+async function f() {
+    return 1;
+}
+
+f().then(value => console.log(value)); // 1
+</code></pre>
+			</section>
+			<section>
+				<h2>Await</h2>
+				<p><b>Await is only used with an async function.</b> The keyword <b>await</b>
+					makes JavaScript wait until that promise settles and returns its result.
+					Here’s an example with a promise that resolves in 1 second:</p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+async function f() {
+
+    let promise = new Promise((resolve, reject) => {
+        setTimeout(() => resolve("done!"), 1000);
+    });
+
+    let result = await promise; // wait till the promise resolves (*)
+
+    console.log(result); // "done!"
+}
+
+f();
+</code></pre>
+			</section>
+			<section>
+				<h2>Error handling in async functions</h2>
+				<p>If a promise resolves normally, then <b>await promise</b> returns the result.
+					But in case of a rejection, it throws the error, just as if there were a <b>throw</b>
+					statement at that line. We can catch that error using <b>try..catch</b></p>
+				<pre><code class="hljs" data-trim data-line-numbers>
+async function f() {
+    try {
+        let response = await fetch('http://no-such-url');
+    } catch(err) {
+        console.log(err); // TypeError: failed to fetch
+    }
+}
+
+f();
+</code></pre>
+			</section>
+		</section>
+		<section>
+			<h2>Thank you for your attention!</h2>
+		</section>
+	</div>
+</div>
+
+<script src="js/reveal.js"></script>
+
+<script>
+	// More info about config & dependencies:
+	// - https://github.com/hakimel/reveal.js#configuration
+	// - https://github.com/hakimel/reveal.js#dependencies
+	Reveal.initialize({
+		dependencies: [
+			{ src: 'plugin/markdown/marked.js' },
+			{ src: 'plugin/markdown/markdown.js' },
+			{ src: 'plugin/notes/notes.js', async: true },
+			{ src: 'plugin/highlight/highlight.js', async: true }
+		]
+	});
+</script>
+</body>
 </html>
