@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="reveal.js/css/reset.css">
 	<link rel="stylesheet" href="reveal.js/css/reveal.css">
 	<link rel="stylesheet" href="reveal.js/css/theme/black.css">
+	<link rel="stylesheet" href="reveal.js/css/main.css">
 
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="reveal.js/lib/css/monokai.css">
@@ -91,13 +92,53 @@ introduction('Chris','Nwamba', greeting); // passing function greeting as a para
 			</section>
 			<section>
 				<h2>Promises</h2>
-				<p>A <b>promise</b> is an object which keeps track of whether the asynchronous event has happened
-					already or not and determines what happens after the event has occurred.
-					A promise is used to handle the asynchronous result of an operation.
-					JavaScript is designed to not wait for an asynchronous block of code to completely
-					execute before other synchronous parts of the code can run.
-					For instance, when making API requests to servers, we have no idea if these servers are offline
-					or online, or how long it takes to process the server request.</p>
+				<p>A <b>promise</b> is an object and used to handle the asynchronous result of an operation.
+					<b>Promise</b> makes handling asynchronous code easier and more readable.
+				</p>
+			</section>
+			<section>
+				<div class="container">
+					<div class="left">
+						<h3>Callbacks</h3>
+						<pre><code class="hljs" data-trim data-line-numbers>
+const calcValue = (value, cb) => {
+  cb(value * 2);
+};
+
+const printAll = () => {
+    calcValue(2, (firstValue) => {
+        calcValue(firstValue, (secondValue) => {
+            calcValue(secondValue, () => {});
+        });
+    });
+};
+
+printAll();
+
+// many callbacks, difficult to read code
+</code></pre>
+					</div>
+					<div class="right">
+						<h3>Promise</h3>
+						<pre><code class="hljs" data-trim data-line-numbers>
+const calcValue = value => {
+    return value * 2;
+};
+
+const promise = new Promise((resolve, reject) => {
+    resolve(2);
+});
+
+promise
+.then(value => calcValue(value))
+.then(value => calcValue(value))
+.then(value => calcValue(value))
+.catch(error => console.log(error));
+
+// improved readability, better error handling
+</code></pre>
+					</div>
+				</div>
 			</section>
 			<section>
 				<h2>Promises states</h2>
@@ -148,17 +189,17 @@ const state = new Promise((resolve, reject) => {
 });
 
 state.then(value => {
-    console.log(`Promise resolved, value = ${value}`);
+    console.log(`Resolved value, value = ${value}`);
 })
     .catch(value => {
-        console.log(`Promise rejected, value = ${value}`);
+        console.log(`Rejected value, value = ${value}`);
     });
 </code></pre>
 			</section>
 			<section>
 				<h2>Promises chaining</h2>
-				<p><b>.then()</b> receives a function with an argument which is the resolve value of our promise.
-					<b>.catch</b> returns the reject value of our promise.</p>
+				<p><b>.then()</b> receives a function with an argument which is the resolved value of our promise.
+					<b>.catch</b> returns the rejected value of our promise.</p>
 				<pre><code class="hljs" data-trim data-line-numbers>
 new Promise(function(resolve, reject) {
     setTimeout(() => resolve(1), 1000); // resolves in 1 sec
@@ -171,7 +212,7 @@ new Promise(function(resolve, reject) {
 }).then(result => {
     console.log(result); // 4
     return result * 2;
-});
+}).catch(error => console.log(error)); // if promise rejected catch them
 </code></pre>
 			</section>
 			<section>
@@ -265,6 +306,47 @@ const promise = Promise.race([promises]);
 				</p>
 			</section>
 			<section>
+				<div class="container">
+					<div class="left">
+						<h3>Promise</h3>
+						<pre><code class="hljs" data-trim data-line-numbers>
+const calcValue = value => {
+    return value * 2;
+};
+
+const promise = new Promise(resolve => {
+    resolve(2);
+});
+
+promise
+.then(value => calcValue(value))
+.then(value => calcValue(value))
+.then(value => calcValue(value))
+.catch(error => console.log(error));
+</code></pre>
+					</div>
+					<div class="right">
+						<h3>Async Await</h3>
+						<pre><code class="hljs" data-trim data-line-numbers>
+const calcValue = value => {
+    return value * 2;
+};
+
+const asyncFunction = async () => {
+    const firstRes = await calcValue(2); // 4
+    const secondRes = await calcValue(firstRes); // 8
+    const thirdRes = await calcValue(secondRes); // 16
+};
+
+asyncFunction()
+.then(() => console.log('Async func finished'));
+
+// makes your async code look more like synchronous code
+</code></pre>
+					</div>
+				</div>
+			</section>
+			<section>
 				<h2>Create async functions</h2>
 				<p>Async functions are created by prepending the word <b>async</b> before the function declaration
 					like this:</p>
@@ -345,10 +427,10 @@ f();
 	// - https://github.com/hakimel/reveal.js#dependencies
 	Reveal.initialize({
 		dependencies: [
-			{ src: 'plugin/markdown/marked.js' },
-			{ src: 'plugin/markdown/markdown.js' },
-			{ src: 'plugin/notes/notes.js', async: true },
-			{ src: 'plugin/highlight/highlight.js', async: true }
+			{ src: 'reveal.js/plugin/markdown/marked.js' },
+			{ src: 'reveal.js/plugin/markdown/markdown.js' },
+			{ src: 'reveal.js/plugin/notes/notes.js', async: true },
+			{ src: 'reveal.js/plugin/highlight/highlight.js', async: true }
 		]
 	});
 </script>
